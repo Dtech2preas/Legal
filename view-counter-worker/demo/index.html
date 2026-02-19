@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Counter Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Page View Counter Demo</h1>
+
+        <div class="controls">
+            <label for="workerUrl">Worker URL:</label>
+            <input type="text" id="workerUrl" placeholder="https://your-worker.your-subdomain.workers.dev" value="http://localhost:8787">
+
+            <label for="pageUrl">Simulate Page URL:</label>
+            <input type="text" id="pageUrl" placeholder="sub.example.com" value="test.example.com">
+
+            <button id="trackBtn">Track View</button>
+        </div>
+
+        <div class="stats-container" id="statsDisplay" style="display: none;">
+            <div class="stat-box">
+                <h3>This Site Views</h3>
+                <div class="count" id="siteCount">-</div>
+                <div class="label" id="siteUrlDisplay"></div>
+            </div>
+            <div class="stat-box universal">
+                <h3>Total Network Views</h3>
+                <div class="count" id="globalCount">-</div>
+                <div class="label">All Sites Combined</div>
+            </div>
+        </div>
+
+        <div id="errorMsg" class="error" style="display: none;"></div>
+
+        <div class="code-snippet">
+            <h3>Integration Snippet</h3>
+            <pre><code id="snippetCode">
+&lt;script&gt;
+  const workerUrl = 'YOUR_WORKER_URL';
+  const currentUrl = window.location.hostname; // or full URL
+  fetch(`${workerUrl}?url=${encodeURIComponent(currentUrl)}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('view-count').innerText = data.site_views;
+      document.getElementById('global-count').innerText = data.total_global_views;
+    });
+&lt;/script&gt;
+            </code></pre>
+        </div>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>
