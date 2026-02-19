@@ -4,88 +4,70 @@ A simple Cloudflare Worker to track page views per domain/subdomain, with a glob
 
 ## Features
 
-- **Site-specific tracking**: Counts views for each unique URL/domain provided.
-- **Global tracking**: Maintains a total count of all views across all sites.
-- **Fast**: Uses Cloudflare KV (Key-Value) storage for low-latency updates.
+- **Consolidated Worker**: All logic in a single `worker.js` file.
+- **Site-specific tracking**: Counts views for each unique URL/domain.
+- **Global tracking**: Maintains a total count of all views.
+- **Automatic Detection**: Can detect site URL from `url` query parameter, `Referer` header, or `Origin` header.
 - **CORS enabled**: Can be called from any frontend.
+- **Fast**: Uses Cloudflare KV (Key-Value) storage.
 
 ## Project Structure
 
-- `src/index.js`: The worker logic.
+- `worker.js`: The complete worker script. Copy this to your Cloudflare Worker editor.
 - `demo/`: A simple HTML/JS demo to test the worker.
-- `wrangler.toml`: Configuration file.
 
-## Setup & Deployment
+## Deployment (Cloudflare Dashboard)
 
-1.  **Install Wrangler**:
-    You need Cloudflare's CLI tool `wrangler`.
-    ```bash
-    npm install -g wrangler
-    ```
+1.  **Create a Worker**:
+    - Go to the Cloudflare Dashboard > Workers & Pages.
+    - Click "Create Application" -> "Create Worker".
+    - Give it a name (e.g., `view-counter`).
+    - Click "Deploy".
 
-2.  **Login to Cloudflare**:
-    ```bash
-    wrangler login
-    ```
+2.  **Add KV Namespace**:
+    - Go to "Workers & Pages" -> "KV".
+    - Create a namespace (e.g., `STATS_KV`).
+    - Go back to your Worker settings -> "Settings" -> "Variables" -> "KV Namespace Bindings".
+    - Add a binding:
+        - Variable name: `STATS_KV` (Must be exact).
+        - KV Namespace: Select the namespace you created.
+    - Save and Deploy.
 
-3.  **Create KV Namespace**:
-    You need to create a KV namespace to store the counts.
-    ```bash
-    wrangler kv:namespace create STATS_KV
-    ```
-    This command will output a binding configuration like:
-    ```toml
-    [[kv_namespaces]]
-    binding = "STATS_KV"
-    id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    ```
-
-    Copy the `id` and replace the placeholder in `wrangler.toml`.
-
-4.  **Deploy**:
-    ```bash
-    cd view-counter-worker
-    wrangler deploy
-    ```
-
-    After deployment, you will get a URL like `https://view-counter-worker.your-subdomain.workers.dev`.
+3.  **Update Code**:
+    - Click "Quick Edit" on your Worker.
+    - Delete the default code.
+    - Copy the contents of `worker.js` from this repository and paste it into the editor.
+    - Click "Save and Deploy".
 
 ## Usage
 
 ### Using the Demo
 1.  Open `demo/index.html` in your browser.
-2.  Enter your Worker URL (e.g., `https://view-counter-worker.your-subdomain.workers.dev`).
+2.  Enter your deployed Worker URL (e.g., `https://view-counter.your-subdomain.workers.dev`).
 3.  Enter a site URL to simulate (e.g., `mysite.com`).
 4.  Click "Track View".
 
 ### Integration on Your Website
-Add the following script to your website's HTML:
 
-```html
-<script>
-  (function() {
-    const workerUrl = 'YOUR_WORKER_URL'; // Replace with your actual Worker URL
-    const pageUrl = window.location.hostname; // Or window.location.href for full path
+Simply make a fetch request to your Worker URL.
 
-    fetch(`${workerUrl}?url=${encodeURIComponent(pageUrl)}`)
-      .then(response => response.json())
-      .then(data => {
-        // Update your UI with the data
-        // data.site_views -> Views for this site
-        // data.total_global_views -> Total views across all sites
-
-        // Example:
-        const counterEl = document.getElementById('view-counter');
-        if (counterEl) counterEl.innerText = data.site_views;
-      })
-      .catch(console.error);
-  })();
-</script>
+**Option 1: Automatic Detection**
+```javascript
+fetch('https://your-worker-url.workers.dev')
+  .then(res => res.json())
+  .then(data => {
+    console.log('Site Views:', data.site_views);
+    console.log('Global Views:', data.total_global_views);
+  });
 ```
+*Note: This relies on the browser sending `Referer` or `Origin` headers.*
 
-## Testing Locally
-You can test the worker locally using `wrangler dev`.
-```bash
-wrangler dev
+**Option 2: Explicit URL**
+```javascript
+const currentUrl = window.location.hostname;
+fetch(`https://your-worker-url.workers.dev?url=${encodeURIComponent(currentUrl)}`)
+  .then(res => res.json())
+  .then(data => {
+    console.log('Site Views:', data.site_views);
+  });
 ```
-This will start a local server (usually at `http://localhost:8787`). You can point the demo page to this local URL.
