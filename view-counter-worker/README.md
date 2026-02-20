@@ -14,7 +14,9 @@ A simple Cloudflare Worker to track page views per domain/subdomain, with a glob
 ## Project Structure
 
 - `worker.js`: The complete worker script. Copy this to your Cloudflare Worker editor.
-- `demo/`: A simple HTML/JS demo to test the worker.
+- `demo/`: Contains demo files.
+    - `index.html`: A tester interface to manually check the worker.
+    - `embeddable-widget.html`: The copy-paste widget code for your website.
 
 ## Deployment (Cloudflare Dashboard)
 
@@ -47,9 +49,18 @@ A simple Cloudflare Worker to track page views per domain/subdomain, with a glob
 3.  Enter a site URL to simulate (e.g., `mysite.com`).
 4.  Click "Track View".
 
-### Integration on Your Website
+### Embeddable Widget (Recommended)
 
-Simply make a fetch request to your Worker URL.
+To add a visible view counter to your website:
+
+1.  Open `demo/embeddable-widget.html`.
+2.  Copy the entire code snippet.
+3.  Paste it into your website's HTML `<body>` where you want the counter to appear.
+4.  Update the `WORKER_URL` variable in the script to point to your deployed worker (e.g., `https://view-counter.your-subdomain.workers.dev`).
+
+### Custom Integration (API Only)
+
+If you want to build your own UI, simply make a fetch request to your Worker URL.
 
 **Option 1: Automatic Detection**
 ```javascript
