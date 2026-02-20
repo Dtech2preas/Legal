@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Counter Widget Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            padding: 50px;
+            text-align: center;
+        }
+        h1 { margin-bottom: 40px; }
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>My Website</h1>
+
+    <div class="content">
+        <p>This is some content on my website.</p>
+        <p>Below is the embedded view counter widget:</p>
+
+        <hr>
+
+        <!-- PASTE WIDGET CODE HERE -->
+
+<style>
+  /* Scoped CSS for View Counter Widget */
+  .vc-widget {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e1e1e1;
+    max-width: 400px;
+    margin: 20px auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .vc-stat {
+    text-align: center;
+    padding: 0 10px;
+  }
+
+  .vc-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+
+  .vc-count {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
+  }
+
+  /* Optional: Highlight global count */
+  .vc-global .vc-count {
+    color: #0070f3;
+  }
+</style>
+
+<div class="vc-widget" id="vc-widget">
+  <div class="vc-stat">
+    <div class="vc-label">Page Views</div>
+    <div class="vc-count" id="vc-site-count">-</div>
+  </div>
+  <div class="vc-stat vc-global">
+    <div class="vc-label">Total Views</div>
+    <div class="vc-count" id="vc-global-count">-</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // CONFIGURATION: Replace with your deployed Worker URL
+  const WORKER_URL = 'http://localhost:8787'; // Default for local testing, change for production
+
+  // Get current page identifier
+  const currentUrl = window.location.hostname;
+
+  // Fetch stats from Worker
+  fetch(`${WORKER_URL}?url=${encodeURIComponent(currentUrl)}`)
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      // Update the DOM elements
+      const siteCountEl = document.getElementById('vc-site-count');
+      const globalCountEl = document.getElementById('vc-global-count');
+
+      if (siteCountEl) siteCountEl.innerText = data.site_views;
+      if (globalCountEl) globalCountEl.innerText = data.total_global_views;
+    })
+    .catch(error => {
+      console.error('Error fetching view counts:', error);
+      // Optional: show error state in UI
+      document.getElementById('vc-site-count').innerText = '?';
+      document.getElementById('vc-global-count').innerText = '?';
+    });
+})();
+</script>
+
+        <!-- END WIDGET CODE -->
+
+        <hr>
+        <p>Thanks for visiting!</p>
+    </div>
+
+</body>
+</html>
